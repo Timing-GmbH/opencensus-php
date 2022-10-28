@@ -393,7 +393,9 @@ class Span
      */
     private function generateSpanId()
     {
-        return dechex(mt_rand());
+        // The `upstream` implementation generates only an 8-character hex string (i.e. 4 bytes),
+        // but OpenTelemetry requires 8 bytes, so we repeat `dechex(mt_rand())` twice.
+        return dechex(mt_rand()) . dechex(mt_rand());
     }
 
     /**
