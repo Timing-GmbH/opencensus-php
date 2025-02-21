@@ -46,7 +46,7 @@ class HttpHeaderPropagator implements PropagatorInterface
      * @param string $key [optional] The header key to store/retrieve the
      *        encoded SpanContext. **Defaults to** `HTTP_X_CLOUD_TRACE_CONTEXT`
      */
-    public function __construct(FormatterInterface $formatter = null, $header = null)
+    public function __construct(?FormatterInterface $formatter = null, $header = null)
     {
         $this->formatter = $formatter ?: new CloudTraceFormatter();
         $this->header = $header ?: self::DEFAULT_HEADER;

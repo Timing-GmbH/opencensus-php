@@ -44,7 +44,7 @@ class Aggregation
      */
     private $bounds;
 
-    final private function __construct(int $type, array $bounds = null)
+    final private function __construct(int $type, ?array $bounds = null)
     {
         $this->type = $type;
         $this->bounds = $bounds;

@@ -70,7 +70,7 @@ class Binary
      * @param \Exception $err Set on deserialization errors and size constraints.
      * @return TagContext
      */
-    public static function decode(string $str, \Exception &$err = null): TagContext
+    public static function decode(string $str, ?\Exception &$err = null): TagContext
     {
         $tagContext = TagContext::empty();
         $strLen = strlen($str);

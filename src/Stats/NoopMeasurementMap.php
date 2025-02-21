@@ -35,7 +35,7 @@ class NoopMeasurementMap implements MeasurementInterface
         return $this;
     }
 
-    public function record(Context $ctx = null, TagContext $tags = null): bool
+    public function record(?Context $ctx = null, ?TagContext $tags = null): bool
     {
         return true;
     }

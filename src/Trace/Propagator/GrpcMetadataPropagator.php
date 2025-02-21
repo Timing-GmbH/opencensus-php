@@ -46,7 +46,7 @@ class GrpcMetadataPropagator implements PropagatorInterface
      * @param string $key [optional] The grpc metadata key to store/retrieve the encoded SpanContext.
      *        **Defaults to** `grpc-trace-bin`
      */
-    public function __construct(FormatterInterface $formatter = null, $key = null)
+    public function __construct(?FormatterInterface $formatter = null, $key = null)
     {
         $this->formatter = $formatter ?: new BinaryFormatter();
         $this->key = $key ?: self::DEFAULT_METADATA_KEY;

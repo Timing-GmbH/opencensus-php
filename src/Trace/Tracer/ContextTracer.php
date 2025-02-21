@@ -43,7 +43,7 @@ class ContextTracer implements TracerInterface
      * @param SpanContext|null $initialContext [optional] The starting span
      *     context.
      */
-    public function __construct(SpanContext $initialContext = null)
+    public function __construct(?SpanContext $initialContext = null)
     {
         if ($initialContext) {
             Context::current()->withValues([

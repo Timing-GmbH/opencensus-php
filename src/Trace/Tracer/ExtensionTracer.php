@@ -48,7 +48,7 @@ class ExtensionTracer implements TracerInterface, SpanEventHandlerInterface
      * @param SpanContext|null $initialContext [optional] The starting span
      *     context.
      */
-    public function __construct(SpanContext $initialContext = null)
+    public function __construct(?SpanContext $initialContext = null)
     {
         if ($initialContext) {
             opencensus_trace_set_context($initialContext->traceId(), $initialContext->spanId());
