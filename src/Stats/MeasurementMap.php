@@ -69,7 +69,7 @@ class MeasurementMap implements MeasurementInterface
      * @param TagContext $tags The TagContext of Tags to add to the recorded Measurements.
      * @return bool Returns true on success.
      */
-    public function record(Context $ctx = null, TagContext $tags = null): bool
+    public function record(?Context $ctx = null, ?TagContext $tags = null): bool
     {
         // without measurements we can bail out immediately
         if (count($this->measurements) === 0) {

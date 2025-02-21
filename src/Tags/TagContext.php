@@ -170,7 +170,7 @@ class TagContext
      * @param Context $ctx The Context to extract the TagContext from.
      * @return TagContext
      */
-    final public static function fromContext(Context $ctx = null): TagContext
+    final public static function fromContext(?Context $ctx = null): TagContext
     {
         if ($ctx === null) {
             $ctx = Context::current();
@@ -186,7 +186,7 @@ class TagContext
      * @param Context $ctx The Context to extract and copy the TagContext from.
      * @return TagContext
      */
-    final public static function new(Context $ctx = null): TagContext
+    final public static function new(?Context $ctx = null): TagContext
     {
         return clone self::fromContext($ctx);
     }
@@ -199,7 +199,7 @@ class TagContext
      * @param Context $ctx The source context to copy.
      * @return Context The target context with our TagContext added.
      */
-    final public function newContext(Context $ctx = null): Context
+    final public function newContext(?Context $ctx = null): Context
     {
         if ($ctx === null) {
             $ctx = Context::current();

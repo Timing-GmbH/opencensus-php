@@ -88,7 +88,7 @@ class QpsSampler implements SamplerInterface
      *     @type string $key The cache key to use. **Defaults to** `__opencensus_trace__`
      * }
      */
-    public function __construct(CacheItemPoolInterface $cache = null, $options = [])
+    public function __construct(?CacheItemPoolInterface $cache = null, $options = [])
     {
         $this->cache = $cache ?: $this->defaultCache();
         if (!$this->cache) {

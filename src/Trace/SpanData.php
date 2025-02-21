@@ -170,8 +170,8 @@ class SpanData
         $name,
         $traceId,
         $spanId,
-        \DateTimeInterface $startTime = null,
-        \DateTimeInterface $endTime = null,
+        ?\DateTimeInterface $startTime = null,
+        ?\DateTimeInterface $endTime = null,
         array $options = []
     ) {
         $options += [
