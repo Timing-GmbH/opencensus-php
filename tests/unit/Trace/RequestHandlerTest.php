@@ -716,7 +716,57 @@ class RequestHandlerTest extends TestCase
             $this->assertNull($spanData->status());
         } else {
             $this->assertInstanceOf(Status::class, $spanData->status());
-            $this->assertEquals(200, $spanData->status()->code());
+            // A 2xx response maps to the canonical OK code (0), not the raw HTTP code.
+            $this->assertEquals(0, $spanData->status()->code());
         }
+    }
+
+    /**
+     * @dataProvider httpStatusToCanonicalCodeProvider
+     */
+    public function testMapsHttpStatusToCanonicalStatusCode($httpStatus, $expectedCode)
+    {
+        $this->sampler->shouldSample()->willReturn(true);
+        $rt = new RequestHandler(
+            $this->exporter->reveal(),
+            $this->sampler->reveal(),
+            new HttpHeaderPropagator(),
+            [
+                'skipReporting' => true
+            ]
+        );
+        MockHttpResponseCode::$status = $httpStatus;
+        $rt->onExit();
+        $spanData = $rt->tracer()->spans()[0];
+
+        // The raw HTTP code is always preserved verbatim in the attribute.
+        $this->assertEquals([Span::ATTRIBUTE_STATUS_CODE => $httpStatus], $spanData->attributes());
+
+        if (extension_loaded('opencensus')) {
+            $this->assertNull($spanData->status());
+        } else {
+            $this->assertInstanceOf(Status::class, $spanData->status());
+            $this->assertEquals($expectedCode, $spanData->status()->code());
+        }
+    }
+
+    public function httpStatusToCanonicalCodeProvider()
+    {
+        return [
+            [200, 0],   // OK
+            [204, 0],   // OK
+            [301, 0],   // OK
+            [400, 3],   // INVALID_ARGUMENT
+            [401, 16],  // UNAUTHENTICATED
+            [403, 7],   // PERMISSION_DENIED
+            [404, 5],   // NOT_FOUND
+            [429, 8],   // RESOURCE_EXHAUSTED
+            [499, 1],   // CANCELLED
+            [418, 2],   // UNKNOWN (unmapped 4xx)
+            [500, 2],   // UNKNOWN
+            [501, 12],  // UNIMPLEMENTED
+            [503, 14],  // UNAVAILABLE
+            [504, 4],   // DEADLINE_EXCEEDED
+        ];
     }
 }

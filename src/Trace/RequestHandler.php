@@ -262,7 +262,15 @@ class RequestHandler
     public function addCommonRequestAttributes(array $headers)
     {
         if ($responseCode = http_response_code()) {
-            $this->rootSpan->setStatus($responseCode, "HTTP status code: $responseCode");
+            // The span status `code` is a canonical (google.rpc.Code) value where 0 (OK) is the only
+            // non-error value. Storing the raw HTTP status here made backends such as Cloud Trace report
+            // every successful (2xx) request as an error, so map it the way the other OpenCensus
+            // instrumentations do (see opencensus-specs/trace/HTTP.md). The raw HTTP code is still kept
+            // verbatim in the /http/status_code attribute below.
+            $this->rootSpan->setStatus(
+                self::canonicalCodeFromHttpStatusCode($responseCode),
+                "HTTP status code: $responseCode"
+            );
             $this->tracer->addAttribute(Span::ATTRIBUTE_STATUS_CODE, $responseCode, [
                 'spanId' => $this->rootSpan->spanId()
             ]);
@@ -303,5 +311,44 @@ class RequestHandler
             }
         }
         return null;
+    }
+
+    /**
+     * Map an HTTP status code to its canonical (google.rpc.Code) trace status code.
+     *
+     * 2xx/3xx responses map to OK (0); everything else maps to the closest canonical
+     * error code, defaulting to UNKNOWN (2). Mirrors opencensus-specs/trace/HTTP.md.
+     *
+     * @param int $httpStatusCode
+     * @return int
+     */
+    private static function canonicalCodeFromHttpStatusCode($httpStatusCode)
+    {
+        switch ($httpStatusCode) {
+            case 400:
+                return 3;  // INVALID_ARGUMENT
+            case 401:
+                return 16; // UNAUTHENTICATED
+            case 403:
+                return 7;  // PERMISSION_DENIED
+            case 404:
+                return 5;  // NOT_FOUND
+            case 429:
+                return 8;  // RESOURCE_EXHAUSTED
+            case 499:
+                return 1;  // CANCELLED
+            case 501:
+                return 12; // UNIMPLEMENTED
+            case 503:
+                return 14; // UNAVAILABLE
+            case 504:
+                return 4;  // DEADLINE_EXCEEDED
+        }
+
+        if ($httpStatusCode >= 200 && $httpStatusCode < 400) {
+            return 0;  // OK
+        }
+
+        return 2;  // UNKNOWN
     }
 }
